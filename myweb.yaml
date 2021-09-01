@@ -16,10 +16,9 @@ spec:
         app: myweb
     spec:
       containers:
-      - image: kenp8036/jenkins:1
+      - image: kenp8036/jenkins:8
         imagePullPolicy: Always
         name: myweb
-
 ---
 apiVersion: v1
 kind: Service
