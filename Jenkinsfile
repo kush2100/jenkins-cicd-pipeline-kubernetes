@@ -36,10 +36,8 @@ pipeline {
       steps {
         script {
                 kubernetesDeploy(configs: "myweb.yaml", kubeconfigId: "testkubeconfig") {
-                sh 'kubectl apply -f ./'
-        }
-      }
-    }  
-   }
+         }
+       }  
+     }
   }  
 }
