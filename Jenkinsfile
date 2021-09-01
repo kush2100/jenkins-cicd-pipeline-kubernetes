@@ -1,44 +1,47 @@
 pipeline {
+
   environment {
     registry = "kenp8036/jenkins"
-    registryCredential = 'dockerhub'
-    dockerImage = ''
+    dockerImage = ""
   }
+
   agent any
+
   stages {
-    stage('Cloning Git') {
+
+    stage('Checkout Source') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github', url: 'https://github.com/kush2100/jenkins-cicd-pipeline-kubernetes.git']]])
-        }
+        git 'https://github.com/justmeandopensource/playjenkins.git'
       }
-    stage('Building Docker image') {
+    }
+
+    stage('Build image') {
       steps{
         script {
           dockerImage = docker.build registry + ":$BUILD_NUMBER"
         }
       }
     }
-    stage('Deploy Image') {
+
+    stage('Push Image') {
       steps{
         script {
-          docker.withRegistry( '', registryCredential ) {
+          docker.withRegistry( "" ) {
             dockerImage.push()
           }
         }
       }
     }
-    stage('Remove Unused docker image') {
-      steps{
-        sh "docker rmi $registry:$BUILD_NUMBER"
-      }
-    }    
+
     stage('Deploy App') {
       steps {
         script {
-                kubernetesDeploy(configs: "myweb.yaml", kubeconfigId: "testkubeconfig") {
-         }
-       }  
-     }
+          kubernetesDeploy(configs: "myweb.yaml", kubeconfigId: "testkubeconfig")
+          sh 'kubectl apply -f my-kubernetes-directory'
+        }
+      }
     }
-  }  
+
+  }
+
 }
